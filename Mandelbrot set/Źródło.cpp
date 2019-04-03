@@ -3,9 +3,9 @@
 #include <time.h>
 
 bool running = true;
-double reLeft = -2.4;
-double imagTop = -1.5;
-double complexScale = 0.005;
+long double reLeft = -2.4L;
+long double imagTop = -1.5L;
+long double complexScale = 0.005L;
 ALLEGRO_BITMAP *mandelbrot;
 ALLEGRO_EVENT_QUEUE *queue;
 
@@ -22,8 +22,8 @@ int main() {
 	al_register_event_source(queue, al_get_mouse_event_source());
 	mandelbrot = al_create_bitmap(960, 600);
 	int *xArray, *yArray;
-	xArray = malloc(576000 * sizeof(int));
-	yArray = malloc(576000 * sizeof(int));
+	xArray = new int[576000];
+	yArray = new int[576000];
 	for (int i = 0; i < 576000; i++) {
 		xArray[i] = i % 960;
 		yArray[i] = i / 960;
@@ -51,7 +51,7 @@ int main() {
 					break;
 				case ALLEGRO_EVENT_MOUSE_AXES: {
 					if (event.mouse.dz) {
-						double newComplexScale = complexScale * pow(2.0, -event.mouse.dz);
+						long double newComplexScale = complexScale * powl(2.0L, -event.mouse.dz);
 						reLeft += (complexScale - newComplexScale) * event.mouse.x;
 						imagTop += (complexScale - newComplexScale) * event.mouse.y;
 						complexScale = newComplexScale;
@@ -63,12 +63,12 @@ int main() {
 		al_lock_bitmap(mandelbrot, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
 		al_set_target_bitmap(mandelbrot);
 
-		double re;
-		double imag;
-		double reTemp;
-		double imagTemp;
+		long double re;
+		long double imag;
+		long double reTemp;
+		long double imagTemp;
 		int iterations;
-		double reTempTemp;
+		long double reTempTemp;
 		clock_t timeout = clock() + 0.1 * CLOCKS_PER_SEC;
 		do {
 			int x = xArray[i];
@@ -76,14 +76,14 @@ int main() {
 			re = reLeft + x * complexScale;
 			imag = imagTop + y * complexScale;
 
-			reTemp = 0.0;
-			imagTemp = 0.0;
+			reTemp = 0.0L;
+			imagTemp = 0.0L;
 			iterations = 0;
 			for (; iterations < maxIterations; iterations++) {
 				reTempTemp = reTemp * reTemp - imagTemp * imagTemp + re;
-				imagTemp = 2 * reTemp * imagTemp + imag;
+				imagTemp = 2.0L * reTemp * imagTemp + imag;
 				reTemp = reTempTemp;
-				if (sqrt(reTemp * reTemp + imagTemp * imagTemp) >= 2.0) break;
+				if (sqrtl(reTemp * reTemp + imagTemp * imagTemp) >= 2.0L) break;
 			}
 			iterations *= 768.0 / maxIterations;
 			if (iterations < 766) {
@@ -104,6 +104,9 @@ int main() {
 		al_draw_bitmap(mandelbrot, 0, 0, 0);
 		al_flip_display();
 	}
+
+	delete[] xArray;
+	delete[] yArray;
 
 	return 0;
 }
